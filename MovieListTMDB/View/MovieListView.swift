@@ -19,6 +19,18 @@ class MovieListView: UIView {
         return tableView
     }()
     
+    lazy var searchBar: UISearchBar = {
+        let searchBar = UISearchBar()
+        searchBar.frame = CGRect(x: 0, y: 0, width: 200, height: 70)
+        searchBar.showsCancelButton = true
+        searchBar.barStyle = .black
+        searchBar.barTintColor = .white
+        searchBar.placeholder = " Search Here..."
+        searchBar.sizeToFit()
+        listTableView.tableHeaderView = searchBar
+        return searchBar
+    }()
+    
     //MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)

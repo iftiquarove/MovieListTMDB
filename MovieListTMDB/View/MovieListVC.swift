@@ -24,6 +24,7 @@ class MovieListVC: UIViewController{
         let view = MovieListView()
         view.listTableView.delegate = self
         view.listTableView.dataSource = self
+        view.searchBar.delegate = self
         return view
     }()
     
@@ -57,6 +58,15 @@ class MovieListVC: UIViewController{
             self.hideActivityIndicator()
             self.movieList = list
         }
+    }
+}
+
+extension MovieListVC: UISearchBarDelegate{
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar){
+        searchBar.endEditing(true)
+        currentPage = 1
+        searchKeyWord = searchBar.text ?? ""
+        getMovieList()
     }
 }
 
@@ -106,6 +116,26 @@ extension MovieListVC: UITableViewDelegate, UITableViewDataSource{
             }
         }
         return CGFloat()
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.row == (movieList?.results?.count ?? 0) - 1{
+            if (movieList?.page) ?? 0 >= (movieList?.totalPages) ?? 0{
+                print("⚠️ No more Movie to show")
+                return
+            }
+            currentPage += 1
+            showActivityIndicator()
+            movieDetailsVM.getMovieList(page: currentPage, query: "marvel") { [weak self] movieList, error in
+                guard let self = self, let movieList = movieList else {
+                    self?.hideActivityIndicator()
+                    return
+                }
+                self.movieList?.page = movieList.page
+                self.movieList?.results?.append(contentsOf: movieList.results!)
+                self.hideActivityIndicator()
+            }
+        }
     }
 }
 
